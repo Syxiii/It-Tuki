@@ -1,7 +1,7 @@
 # Node modules
 node_modules/
 backend/node_modules/
-frontend/node_modules/
+frontend/vite-project/node_modules
 
 # Env variables
 .env
