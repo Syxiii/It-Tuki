@@ -1,34 +1,42 @@
 import { useState } from "react";
 
-function Login() {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+export default function Login({ onLogin }) {
+  const [name, setName] = useState("");
+  const [password, setPassword] = useState("");
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        alert(`Kirjauduttu sisään käyttäjänä: ${email}`);
-    };
+  const handleLogin = () => {
+    if (!name || !password) {
+      alert("Täytä kaikki kentät");
+      return;
+    }
 
-    return (
-        <form onSubmit={handleSubmit}>
-            <h2 style={{textAlign:"center"}}>Kirjautuminen</h2>
-            <input
-                type="email"
-                placeholder="Sähköposti"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-            />
-            <input
-                type="password"
-                placeholder="Salasana"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-            />
-            <button type="submit">Kirjaudu</button>
-        </form>
-    );
+    if ((name === "rasmus" && password === "1234") || (name === "it" && password === "admin")) {
+      onLogin(name);
+    } else {
+      alert("Väärä käyttäjätunnus tai salasana");
+    }
+  };
+
+  return (
+    <div className="login-page">
+      <div className="login-box">
+        <h1>IT Support Portal</h1>
+        <input
+          placeholder="Käyttäjätunnus"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+        <input
+          type="password"
+          placeholder="Salasana"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        <button onClick={handleLogin}>Kirjaudu</button>
+        <p>Demo:</p>
+        <p>rasmus / 1234</p>
+        <p>it / admin</p>
+      </div>
+    </div>
+  );
 }
-
-export default Login;

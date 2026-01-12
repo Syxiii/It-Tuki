@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-function CreateTicket({ tickets, setTickets }) {
+export default function CreateTicket({ tickets, setTickets, user }) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
 
@@ -9,17 +9,19 @@ function CreateTicket({ tickets, setTickets }) {
     const newTicket = {
       id: tickets.length + 1,
       title,
+      description,
       status: "Avoin",
-      user: "matti@example.com", // mock-käyttäjä
+      user,
     };
     setTickets([...tickets, newTicket]);
     setTitle("");
     setDescription("");
+    alert("Tiketti luotu!");
   };
 
   return (
     <form onSubmit={submitTicket}>
-      <h2 style={{textAlign:"center"}}>Uusi tukipyyntö</h2>
+      <h2>Uusi tukipyyntö</h2>
       <input
         placeholder="Otsikko"
         value={title}
@@ -37,5 +39,3 @@ function CreateTicket({ tickets, setTickets }) {
     </form>
   );
 }
-
-export default CreateTicket;
