@@ -4,11 +4,12 @@ import MyTickets from "./pages/MyTickets";
 import AdminDashboard from "./pages/AdminDashboard";
 import Login from "./pages/Login";
 import FAQ from "./pages/FAQ";
+import Welcome from "./pages/Welcome";
 import mockTickets from "./data/mockTickets";
 
 export default function App() {
   const [currentUser, setCurrentUser] = useState(null);
-  const [page, setPage] = useState("dashboard");
+  const [page, setPage] = useState("welcome");
   const [tickets, setTickets] = useState(mockTickets);
 
   if (!currentUser) {
@@ -21,6 +22,7 @@ export default function App() {
         <div className="logo">IT Support</div>
         <p className="user">{currentUser}</p>
         <nav>
+          <button onClick={() => setPage("welcome")}>Etusivu</button>
           {currentUser === "it" && <button onClick={() => setPage("dashboard")}>Dashboard</button>}
           <button onClick={() => setPage("new")}>Tee tiketti</button>
           <button onClick={() => setPage("my")}>Omat tiketit</button>
@@ -30,6 +32,7 @@ export default function App() {
       </div>
 
       <div className="content">
+        {page === "welcome" && <Welcome currentUser={currentUser} />}
         {page === "dashboard" && currentUser === "it" && (
           <AdminDashboard tickets={tickets} setTickets={setTickets} />
         )}
