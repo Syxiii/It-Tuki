@@ -9,7 +9,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"      // change later if you want
+  provider = "postgresql"      // change later if you want
 }
 
 model User {
