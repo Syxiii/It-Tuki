@@ -13,7 +13,7 @@ export default function App() {
       <div className="sidebar">
         <div className="logo">IT Support</div>
 
-        <p className="user">👤 {user}</p>
+        <p className="user"> {user}</p>
 
         <nav>
           <button onClick={() => setPage("dashboard")}>Dashboard</button>
