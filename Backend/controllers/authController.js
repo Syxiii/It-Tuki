@@ -1,5 +1,5 @@
 import prisma from "../prisma/client.js";
-import { verifyPassword } from "../utils/password.js";
+import { hashPassword, verifyPassword } from "../utils/password.js";
 import jwt from "jsonwebtoken";
 
 /**
@@ -53,6 +53,34 @@ export async function login(req, res) {
   }
 }
 
+//Muokkaa myöhemmin tomivaksi.
+//POST /api/auth/register
+
+export async function register(req, res) {
+  try {
+    const { name, email, password } = req.body; 
+    if (!name || !email || !password) {
+      return res.status(400).json({ message: "Nimi, email ja salasana vaaditaan" });
+    }   
+    const existingUser = await prisma.user.findUnique({ where: { email } });
+    if (existingUser) {
+      return res.status(409).json({ message: "Käyttäjä on jo olemassa" });
+    } 
+    const passwordHash = await hashPassword(password);
+    const newUser = await prisma.user.create({
+      data: { name, email, passwordHash, role: "USER" }
+    }); 
+    return res.status(201).json({ 
+      id: newUser.id,
+      email: newUser.email,
+      name: newUser.name,
+      role: newUser.role
+    });
+  } catch (err) {
+    console.error("Registration error:", err);
+    return res.status(500).json({ message: "Palvelinvirhe" });
+  }
+}
 /**
  * POST /api/auth/logout
  * Handles logout (optional for JWT)
