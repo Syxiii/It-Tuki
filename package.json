@@ -1,5 +1,7 @@
 {
   "dependencies": {
-    "jsonwebtoken": "^9.0.3"
+    "@prisma/client": "6.19.2",
+    "jsonwebtoken": "^9.0.3",
+    "prisma": "6.19.2"
   }
 }
