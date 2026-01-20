@@ -10,13 +10,13 @@ import {
 
 const router = express.Router();
 
-// GET /api/gettickets - all tickets (maybe admin only)
+// GET /api/tickets/gettickets - all tickets (maybe admin only)
 router.get("/gettickets", authenticate, getAllTickets);
 
 // GET /api/tickets/my - logged-in user's tickets
 router.get("/my", authenticate, getMyTickets);
 
-// POST /api/createtickets - create new ticket
+// POST /api//tickets/createtickets - create new ticket
 router.post("/createtickets", authenticate, createTicket);
 
 // PUT /api/tickets/update:id - update ticket
