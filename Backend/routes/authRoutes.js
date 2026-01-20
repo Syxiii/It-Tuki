@@ -1,5 +1,5 @@
 import express from "express";
-import { login, logout, register, getUsers, deleteUser} from "../controllers/authController.js";
+import { login, logout, register, getUsers, deleteUser, toggle} from "../controllers/authController.js";
 import { authenticate, requireAdmin } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
@@ -15,5 +15,7 @@ router.post("/register", register);
 router.get("/getusers", authenticate, requireAdmin, getUsers);
 
 router.post("/deleteuser", authenticate, requireAdmin, deleteUser);
+
+router.put("/toggleadmin", authenticate, toggle)
 
 export default router;

@@ -50,7 +50,7 @@ export async function login(req, res) {
   }
 }
 
-//Muokkaa myöhemmin tomivaksi.
+
 //POST /api/auth/register
 
 export async function register(req, res) {
@@ -96,6 +96,45 @@ export async function getUsers(req, res) {
     res.status(500).json({ message: "Palvelinvirhe" });
   }
 }
+/**
+ * PATCH /auth/toggleadmin/:id
+ * Toggles the admin status of a user (ADMIN only)
+ */
+export async function toggle(req, res) {
+  try {
+    const userId = req.params.id;
+
+    if (req.user.id === userId) {
+      return res.status(400).json({ message: "Et voi muuttaa omaa admin-oikeuttasi" });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: "Käyttäjää ei löydy" });
+    }
+
+    const newRole = user.role === "ADMIN" ? "USER" : "ADMIN";
+
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: { role: newRole },
+    });
+
+    return res.status(200).json({
+      id: updatedUser.id,
+      name: updatedUser.name,
+      email: updatedUser.email,
+      role: updatedUser.role,
+    });
+  } catch (err) {
+    console.error("Toggle admin error:", err);
+    res.status(500).json({ message: "Admin-oikeuksien muuttaminen epäonnistui" });
+  }
+}
+
 
 export async function deleteUser(req, res) {
   try {
