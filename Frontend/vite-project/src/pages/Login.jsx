@@ -1,5 +1,4 @@
 import { useState } from "react";
-import initialUsers from "../data/users";
 import api from "../pages/api";
 
 export default function Login({ onLogin }) {

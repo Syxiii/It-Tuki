@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import jwt from "jsonwebtoken";
 import CreateTicket from "./pages/CreateTicket";
 import MyTickets from "./pages/MyTickets";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -6,26 +7,58 @@ import Login from "./pages/Login";
 import FAQ from "./pages/FAQ";
 import Welcome from "./pages/Welcome";
 import UserManagement from "./pages/UserManagement";
-import mockTickets from "./data/mockTickets";
-import initialUsers from "./data/users";
-import api from "./pages/api";
 
 export default function App() {
+  
   const [currentUser, setCurrentUser] = useState(null);
+  const [token, setToken] = useState("");
   const [page, setPage] = useState("welcome");
-  const [tickets, setTickets] = useState(mockTickets);
-  const [users, setUsers] = useState(initialUsers);
+
 
   useEffect(() => {
-    if (currentUser && currentUser.username === "rasmus") {
-      setPage("welcome");
-    } else if (currentUser && currentUser.isAdmin) {
-      setPage("dashboard");
-    }
-  }, [currentUser]);
+    const storedToken = localStorage.getItem("token");
+    const storedUser = localStorage.getItem("user");
 
+    if (storedToken && storedUser) {
+      try {
+        const parsedUser = JSON.parse(storedUser);
+        setCurrentUser(parsedUser);
+        setToken(storedToken);
+
+        // Default page based on role
+        if (parsedUser.role === "ADMIN") setPage("dashboard");
+        else setPage("welcome");
+      } catch {
+        
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+      }
+    }
+  }, []);
+
+  
+  const handleLogin = (token, user) => {
+    localStorage.setItem("token", token);
+    localStorage.setItem("user", JSON.stringify(user));
+    setToken(token);
+    setCurrentUser(user);
+
+    if (user.role === "ADMIN") setPage("dashboard");
+    else setPage("welcome");
+  };
+
+  
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    setToken("");
+    setCurrentUser(null);
+    setPage("welcome");
+  };
+
+  
   if (!currentUser) {
-    return <Login onLogin={setCurrentUser} users={users} setUsers={setUsers} />;
+    return <Login onLogin={handleLogin} />;
   }
 
   return (
@@ -33,33 +66,40 @@ export default function App() {
       <div className="sidebar">
         <div className="logo">IT Support</div>
         <div className="user-header">
-          <p className="user">{currentUser.username}</p>
-          {currentUser.isAdmin && <span className="admin-badge">Admin</span>}
+          <p className="user">{currentUser.name}</p>
+          {currentUser.role === "ADMIN" && <span className="admin-badge">Admin</span>}
         </div>
+
         <nav>
           <button onClick={() => setPage("welcome")}>Etusivu</button>
-          {currentUser.isAdmin && <button onClick={() => setPage("dashboard")}>Dashboard</button>}
-          {currentUser.isAdmin && <button onClick={() => setPage("users")}>Käyttäjät</button>}
+          {currentUser.role === "ADMIN" && (
+            <>
+              <button onClick={() => setPage("dashboard")}>Dashboard</button>
+              <button onClick={() => setPage("users")}>Käyttäjät</button>
+            </>
+          )}
           <button onClick={() => setPage("new")}>Tee tiketti</button>
           <button onClick={() => setPage("my")}>Omat tiketit</button>
           <button onClick={() => setPage("faq")}>FAQ</button>
-          <button className="logout" onClick={() => setCurrentUser(null)}>Kirjaudu ulos</button>
+          <button className="logout" onClick={handleLogout}>
+            Kirjaudu ulos
+          </button>
         </nav>
       </div>
 
       <div className="content">
-        {page === "welcome" && <Welcome currentUser={currentUser.username} />}
-        {page === "dashboard" && currentUser.isAdmin && (
-          <AdminDashboard tickets={tickets} setTickets={setTickets} />
+        {page === "welcome" && <Welcome currentUser={currentUser.name} />}
+        {page === "dashboard" && currentUser.role === "ADMIN" && (
+          <AdminDashboard token={token} />
         )}
-        {page === "users" && currentUser.isAdmin && (
-          <UserManagement users={users} setUsers={setUsers} />
+        {page === "users" && currentUser.role === "ADMIN" && (
+          <UserManagement token={token} />
         )}
         {page === "new" && (
-          <CreateTicket tickets={tickets} setTickets={setTickets} user={currentUser.username} />
+          <CreateTicket token={token} user={currentUser.name} />
         )}
         {page === "my" && (
-          <MyTickets tickets={tickets} currentUser={currentUser.username} />
+          <MyTickets token={token} currentUser={currentUser.name} />
         )}
         {page === "faq" && <FAQ />}
       </div>

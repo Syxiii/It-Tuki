@@ -1,5 +1,5 @@
 import express from "express";
-import { authenticate } from "../middleware/authMiddleware.js";
+import { authenticate, requireAdmin } from "../middleware/authMiddleware.js";
 import {
   getAllTickets,
   getMyTickets,
@@ -11,7 +11,7 @@ import {
 const router = express.Router();
 
 // GET /api/tickets/gettickets - all tickets (maybe admin only)
-router.get("/gettickets", authenticate, getAllTickets);
+router.get("/gettickets", authenticate, requireAdmin, getAllTickets);
 
 // GET /api/tickets/my - logged-in user's tickets
 router.get("/my", authenticate, getMyTickets);
@@ -20,9 +20,9 @@ router.get("/my", authenticate, getMyTickets);
 router.post("/createtickets", authenticate, createTicket);
 
 // PUT /api/tickets/update:id - update ticket
-router.put("/update:id", authenticate, updateTicket);
+router.put("/update/:id", authenticate, updateTicket);
 
 // DELETE /api/tickets/delete:id - delete ticket
-router.delete("/delete:id", authenticate, deleteTicket);
+router.delete("/delete/:id", authenticate, deleteTicket);
 
 export default router;

@@ -1,9 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import api from "../pages/api";
 
-import { useEffect, useState } from "react";
-
-export default function UserManagement() {
+export default function UserManagement({ token }) {
   const [users, setUsers] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [name, setName] = useState("");
@@ -11,29 +9,16 @@ export default function UserManagement() {
   const [password, setPassword] = useState("");
 
   useEffect(() => {
-    fetchUsers();
-  }, [])
-
     const fetchUsers = async () => {
-    try {
-      const res = await api.get("/auth/getusers");
-      setUsers(res.data);
-    } catch {
-      alert("Käyttäjien haku epäonnistui");
-    }
-  };
-
-  // tee myöhemmin const toggleAdminStatus = async (user) =>
-
-  const deleteUser = async (id) => {
-
       try {
-      await api.delete(`auth/deleteusers/${id}`);
-      fetchUsers();
-    } catch {
-      alert("Käyttäjän poisto epäonnistui");
-    }
-  };
+        const res = await api.get("/auth/getusers");
+        setUsers(res.data);
+      } catch {
+        alert("Käyttäjien haku epäonnistui");
+      }
+    };
+    fetchUsers();
+  }, [token]);
 
   const addNewUser = async () => {
     if (!name || !email || !password) {
@@ -42,17 +27,47 @@ export default function UserManagement() {
     }
 
     try {
-      await api.post("auth/register", { name, email, password });
-
+      await api.post(
+        "/auth/register",
+        { name, email, password }
+      );
       setName("");
       setEmail("");
       setPassword("");
       setShowForm(false);
-      fetchUsers();
+      // refresh users
+      const res = await api.get("/auth/getusers");
+      setUsers(res.data);
       alert("Käyttäjä luotu!");
+    } catch (err) {
+      alert(err.response?.data?.message || "Käyttäjän luonti epäonnistui");
+    }
+  };
 
-    } catch (error) {
-      alert(error.response?.data?.message || "Käyttäjän luonti epäonnistui");
+  const deleteUser = async (id) => {
+    if (!confirm("Oletko varma että haluat poistaa käyttäjän?")) return;
+    try {
+      await api.delete(`/auth/deleteusers/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setUsers(users.filter((u) => u.id !== id));
+    } catch {
+      alert("Käyttäjän poisto epäonnistui");
+    }
+  };
+
+  const toggleAdminStatus = async (id) => {
+    try {
+      await api.patch(`/auth/toggleadmin/${id}`, {}, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      // refresh users
+      const res = await api.get("/auth/getusers", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setUsers(res.data);
+    } catch {
+      alert("Admin-oikeuksien muuttaminen epäonnistui");
     }
   };
 
@@ -69,19 +84,18 @@ export default function UserManagement() {
           <h3>Uusi käyttäjä</h3>
           <input
             placeholder="Käyttäjätunnus"
-            value={newUsername}
+            value={name}
             onChange={(e) => setName(e.target.value)}
           />
           <input
             placeholder="Sähköposti"
-            value={newEmail}
+            value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
           <input
-          
             type="password"
             placeholder="Salasana"
-            value={newPassword}
+            value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
           <button onClick={addNewUser}>Luo käyttäjä</button>
@@ -92,17 +106,17 @@ export default function UserManagement() {
         {users.map((user) => (
           <div key={user.id} className="user-item">
             <div className="user-info">
-              <span className="username">{user.username}</span>
-              <span className={`role-badge ${user.isAdmin ? "admin" : "user"}`}>
-                {user.isAdmin ? "Admin" : "Käyttäjä"}
+              <span className="username">{user.name}</span>
+              <span className={`role-badge ${user.role === "ADMIN" ? "admin" : "user"}`}>
+                {user.role === "ADMIN" ? "Admin" : "Käyttäjä"}
               </span>
             </div>
             <div className="user-actions">
               <button
-                className={`admin-toggle ${user.isAdmin ? "remove" : "add"}`}
+                className={`admin-toggle ${user.role === "ADMIN" ? "remove" : "add"}`}
                 onClick={() => toggleAdminStatus(user.id)}
               >
-                {user.isAdmin ? "Poista admin" : "Tee admin"}
+                {user.role === "ADMIN" ? "Poista admin" : "Tee admin"}
               </button>
               <button className="delete-btn" onClick={() => deleteUser(user.id)}>
                 Poista
