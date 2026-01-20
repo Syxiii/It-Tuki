@@ -72,6 +72,12 @@ export async function updateTicket(req, res) {
     const { id } = req.params;
     const { title, description, status, priority } = req.body;
 
+      const statusMap = {
+      Avoin: "AVOIN",
+      "Käsittelyssä": "KASITTELYSSA",
+      Ratkaistu: "RATKAISTU"
+    };
+
     const ticket = await prisma.ticket.findUnique({ where: { id: parseInt(id) } });
     if (!ticket) {
       return res.status(404).json({ message: "Tikettiä ei löytynyt" });
@@ -82,10 +88,13 @@ export async function updateTicket(req, res) {
       data: {
         title: title || ticket.title,
         description: description || ticket.description,
-        status: status || ticket.status,
+        status: statusMap[status] || ticket.status,
         priority: priority || ticket.priority
-      }
-    });
+      },
+      include: {
+        user: true 
+    }
+   });
 
     res.status(200).json(updatedTicket);
   } catch (err) {

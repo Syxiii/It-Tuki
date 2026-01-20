@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import jwt from "jsonwebtoken";
 import CreateTicket from "./pages/CreateTicket";
 import MyTickets from "./pages/MyTickets";
 import AdminDashboard from "./pages/AdminDashboard";

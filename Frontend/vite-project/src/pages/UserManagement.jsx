@@ -58,7 +58,7 @@ export default function UserManagement({ token }) {
 
   const toggleAdminStatus = async (id) => {
     try {
-      await api.patch(`/auth/toggleadmin/${id}`, {}, {
+      await api.put(`/auth/toggleadmin/${id}`, {userId: id}, {
         headers: { Authorization: `Bearer ${token}` },
       });
       // refresh users
@@ -67,7 +67,7 @@ export default function UserManagement({ token }) {
       });
       setUsers(res.data);
     } catch {
-      alert("Admin-oikeuksien muuttaminen epäonnistui");
+      alert("Admin-oikeuksien muuttaminen epäonnistui frontendissä");
     }
   };
 

@@ -23,8 +23,6 @@ export default function CreateTicket({ tickets, setTickets }) {
         priority
       });
 
-      setTickets([...tickets, res.data]);
-
       setTitle("");
       setDescription("");
       setPriority("KESKITASO");

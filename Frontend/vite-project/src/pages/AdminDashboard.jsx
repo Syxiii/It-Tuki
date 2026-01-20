@@ -5,6 +5,12 @@ export default function AdminDashboard({ token }) {
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const STATUS = {
+  AVOIN: "AVOIN",
+  KASITTELYSSA: "KASITTELYSSA",
+  RATKAISTU: "RATKAISTU"
+};
+
   useEffect(() => {
     const fetchTickets = async () => {
       try {
@@ -52,10 +58,11 @@ export default function AdminDashboard({ token }) {
   if (loading) return <div>Ladataan tikettejä...</div>;
 
   const stats = {
-    Avoin: tickets.filter((t) => t.status === "Avoin").length,
-    "Käsittelyssä": tickets.filter((t) => t.status === "Käsittelyssä").length,
-    Ratkaistu: tickets.filter((t) => t.status === "Ratkaistu").length,
+    Avoin: tickets.filter((t) => t.status === STATUS.AVOIN).length,
+    "Käsittelyssä": tickets.filter((t) => t.status === STATUS.KASITTELYSSA).length,
+    Ratkaistu: tickets.filter((t) => t.status === STATUS.RATKAISTU).length
   };
+
 
   return (
     <div className="container">

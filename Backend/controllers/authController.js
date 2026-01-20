@@ -97,12 +97,12 @@ export async function getUsers(req, res) {
   }
 }
 /**
- * PATCH /auth/toggleadmin/:id
+ * PUT /auth/toggleadmin/:id
  * Toggles the admin status of a user (ADMIN only)
  */
 export async function toggle(req, res) {
   try {
-    const userId = req.params.id;
+    const userId = parseInt(req.body.userId);
 
     if (req.user.id === userId) {
       return res.status(400).json({ message: "Et voi muuttaa omaa admin-oikeuttasi" });

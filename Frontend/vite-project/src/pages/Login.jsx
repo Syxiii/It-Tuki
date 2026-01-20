@@ -21,9 +21,7 @@ export default function Login({ onLogin }) {
     });
 
     const {token, user} = response.data;
-    localStorage.setItem("token", token);
-
-    onLogin(user);
+    onLogin(token, user);
 
 
   } catch (error) {
