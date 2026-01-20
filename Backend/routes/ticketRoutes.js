@@ -10,19 +10,19 @@ import {
 
 const router = express.Router();
 
-// GET /api/tickets - all tickets (maybe admin only)
-router.get("/", authenticate, getAllTickets);
+// GET /api/gettickets - all tickets (maybe admin only)
+router.get("/gettickets", authenticate, getAllTickets);
 
 // GET /api/tickets/my - logged-in user's tickets
 router.get("/my", authenticate, getMyTickets);
 
-// POST /api/tickets - create new ticket
-router.post("/", authenticate, createTicket);
+// POST /api/createtickets - create new ticket
+router.post("/createtickets", authenticate, createTicket);
 
-// PUT /api/tickets/:id - update ticket
-router.put("/:id", authenticate, updateTicket);
+// PUT /api/tickets/update:id - update ticket
+router.put("/update:id", authenticate, updateTicket);
 
-// DELETE /api/tickets/:id - delete ticket
-router.delete("/:id", authenticate, deleteTicket);
+// DELETE /api/tickets/delete:id - delete ticket
+router.delete("/delete:id", authenticate, deleteTicket);
 
 export default router;

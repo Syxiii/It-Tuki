@@ -12,8 +12,8 @@ router.post("/logout", logout);
 
 router.post("/register", register);
 
-router.get("/getusers", authenticate, getUsers);
+router.get("/getusers", authenticate, requireAdmin, getUsers);
 
-router.post("/deleteuser", authenticate, deleteUser);
+router.post("/deleteuser", authenticate, requireAdmin, deleteUser);
 
 export default router;
