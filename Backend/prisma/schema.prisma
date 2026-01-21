@@ -15,6 +15,7 @@ model User {
   role         Role     @default(USER)
   createdAt    DateTime @default(now())
   tickets      Ticket[]
+  comments     Comment[]
 }
 
 model Ticket {
@@ -27,6 +28,20 @@ model Ticket {
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
   user        User         @relation(fields: [userId], references: [id])
+  comments    Comment[]
+}
+
+model Comment {
+  id        Int            @id @default(autoincrement())
+  content   String
+
+  ticketId  Int
+  userId    Int
+
+  createdAt DateTime       @default(now())
+
+  ticket    Ticket         @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 enum Role {
