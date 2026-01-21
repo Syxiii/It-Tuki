@@ -92,3 +92,7 @@ export async function updateTicketComment(req, res){
     }
 
 }
+
+export async function deleteTicketComment(req, res) {
+    
+}

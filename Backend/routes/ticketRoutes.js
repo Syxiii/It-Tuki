@@ -7,7 +7,7 @@ import {
   updateTicket,
   deleteTicket
 } from "../controllers/ticketController.js";
-import { getTicketComment, createTicketComment, updateTicketComment } from "../controllers/commentController.js";
+import { getTicketComment, createTicketComment, updateTicketComment, deleteTicketComment } from "../controllers/commentController.js";
 
 const router = express.Router();
 
@@ -34,7 +34,10 @@ router.get("/:id/getcomment", authenticate, getTicketComment);
 // POST /api/tickets/:id/createcomment - create comment
 router.post("/:id/createcomment", authenticate, createTicketComment);
 
-// PUT /api/tickets/:id/updataecomment - update comment
+// PUT /api/tickets/:id/updatacomment - update comment
 router.put("/:id/updatecomment/:commentid", authenticate, updateTicketComment);
+
+// PUT /api/tickets/:id/deletecomment - update comment
+router.delete("/:id/deletecomment/:commentid", authenticate, deleteTicketComment);
 
 export default router;
