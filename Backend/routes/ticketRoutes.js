@@ -34,10 +34,10 @@ router.get("/:id/getcomment", authenticate, getTicketComment);
 // POST /api/tickets/:id/createcomment - create comment
 router.post("/:id/createcomment", authenticate, createTicketComment);
 
-// PUT /api/tickets/:id/updatacomment - update comment
+// PUT /api/tickets/:id/updatacomment/:commentid - update comment
 router.put("/:id/updatecomment/:commentid", authenticate, updateTicketComment);
 
-// PUT /api/tickets/:id/deletecomment - update comment
+// DELETE /api/tickets/:id/deletecomment/:commentid - delete comment
 router.delete("/:id/deletecomment/:commentid", authenticate, deleteTicketComment);
 
 export default router;
