@@ -19,13 +19,14 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: npm ci
-      - run: npx prisma migrate deploy
+      - run: cd backend && npm ci
+      - run: cd backend && npx prisma migrate deploy --schema=prisma/schema.prisma
         env:
           DATABASE_URL: postgresql://test:test@localhost:5432/test_db
-      - run: npm test
+      - run: cd backend && npm test
         env:
           DATABASE_URL: postgresql://test:test@localhost:5432/test_db
+
 
   build-and-push:
     needs: test
@@ -34,6 +35,7 @@ jobs:
       - uses: actions/checkout@v4
       - run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u USERNAME --password-stdin
       - run: |
+          cd backend
           docker build -t ghcr.io/USERNAME/backend:latest .
           docker push ghcr.io/USERNAME/backend:latest
 
