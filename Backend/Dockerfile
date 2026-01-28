@@ -1,9 +1,12 @@
 FROM node:20-alpine
 
-WORKDIR /backend
+WORKDIR /app
 
 COPY package*.json ./
 RUN npm ci
+
+COPY prisma ./prisma
+RUN npx prisma generate
 
 COPY . .
 

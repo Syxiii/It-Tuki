@@ -17,6 +17,8 @@ app.use("/api/auth", authRoutes);
 app.use("/api/tickets", ticketRoutes);
 app.use("/api/stats", statsRoutes);
 
+app.set("trust proxy", 1);
+
 // Health check
 app.get("/", (req, res) => {
   res.json({
