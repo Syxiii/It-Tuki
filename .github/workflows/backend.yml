@@ -14,18 +14,40 @@ jobs:
           POSTGRES_DB: test_db
           POSTGRES_USER: test
           POSTGRES_PASSWORD: test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U test -d test_db"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=5
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: cd backend && npm ci
-      - run: cd backend && npx prisma migrate deploy --schema=prisma/schema.prisma
+      - run: cd Backend && npm ci
+
+      - name: Install Postgres client
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client
+
+      - name: Wait for Postgres
+        run: |
+          echo "Waiting for Postgres..."
+              for i in {1..30}; do
+                if PGPASSWORD=test psql -h postgres -U test -d test_db -c '\q' 2>/dev/null; then
+                  echo "Postgres ready!"
+                  break
+                fi
+                echo "Still waiting..."
+                sleep 2
+              done
+      - run: cd Backend && npx prisma migrate deploy --schema=prisma/schema.prisma
         env:
-          DATABASE_URL: postgresql://test:test@localhost:5432/test_db
-      - run: cd backend && npm test
+          DOTENV_CONFIG_PATH: ./Backend/.env.test
+      - run: cd Backend && npm test
         env:
-          DATABASE_URL: postgresql://test:test@localhost:5432/test_db
+          DOTENV_CONFIG_PATH: ./Backend/.env.test
 
 
   build-and-push:
@@ -35,7 +57,7 @@ jobs:
       - uses: actions/checkout@v4
       - run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u USERNAME --password-stdin
       - run: |
-          cd backend
+          cd Backend
           docker build -t ghcr.io/USERNAME/backend:latest .
           docker push ghcr.io/USERNAME/backend:latest
 
