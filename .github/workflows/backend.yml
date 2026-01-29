@@ -63,5 +63,5 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             cd /var/www/backend
-            docker compose pull
-            docker compose up -d
+            docker-compose pull
+            docker-compose up -d
