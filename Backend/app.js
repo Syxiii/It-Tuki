@@ -9,11 +9,11 @@ import statsRoutes from "./routes/statsRoutes.js";
 const app = express();
 
 // Global middleware
-app.use(cors({
-  origin: "*", // frontend domain
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  credentials: true,
-}));
+// app.use(cors{
+ //  origin: ["https://localhost:5173", "*"], // frontend domain
+ //  methods: ["GET", "POST", "PUT", "DELETE"],
+ //  credentials: true,}
+// );
 app.use(express.json());
 
 // Route mounting
