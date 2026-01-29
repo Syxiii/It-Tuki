@@ -64,5 +64,6 @@ jobs:
           script: |
             echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u syxiii --password-stdin
             cd /var/www/backend
+            docker-compose down -v
             docker-compose pull
             docker-compose up -d
