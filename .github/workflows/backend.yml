@@ -46,7 +46,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u syxiii --password-stdin
+      - run: echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u syxiii --password-stdin
       - run: |
           cd Backend
           docker build -t ghcr.io/syxiii/backend:latest .
