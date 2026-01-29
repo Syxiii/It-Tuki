@@ -4,7 +4,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://api.luckybunny.eu/api",
+  baseURL: "https://api.luckybunny.eu/api/",
 });
 
 api.interceptors.request.use((config) => {
