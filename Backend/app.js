@@ -10,7 +10,8 @@ const app = express();
 
 // Global middleware
 app.use(cors({
-  origin: ["https://localhost:5173", "https://api.luckybunny.eu"], // frontend domain
+  origin: "*", // frontend domain
+  methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true,
 }));
 app.use(express.json());
