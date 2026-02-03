@@ -138,7 +138,7 @@ export async function toggle(req, res) {
 
 export async function deleteUser(req, res) {
   try {
-    const userId = Number(req.params.id);
+    const userId = parseInt(req.params.id);
 
     if (!userId) {
       return res.status(400).json({ message: "Virheellinen käyttäjä ID" });
