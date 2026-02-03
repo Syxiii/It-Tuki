@@ -1,11 +1,13 @@
-//Käyttäätä Axios-kirjastoa API-kutsuihin backendistä.
-
-//\It-tukiportaali\Backend\routes käytä näitä routeja kutsuihin.
 import axios from "axios";
 
-const api = axios.create({
-  baseURL: "https://api.luckybunny.eu/api",
-});
+// Determine baseURL depending on environment
+const baseURL =
+  process.env.NODE_ENV === "production"
+    ? "https://api.luckybunny.eu/api" // production API
+    : "http://localhost:3000/api";    // development API
+
+const api = axios.create({ baseURL });
+
 
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
@@ -16,6 +18,5 @@ api.interceptors.request.use((config) => {
 
   return config;
 });
-
 
 export default api;

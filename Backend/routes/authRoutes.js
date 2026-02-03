@@ -14,7 +14,7 @@ router.post("/register", register);
 
 router.get("/getusers", authenticate, requireAdmin, getUsers);
 
-router.delete("/deleteuser:id", authenticate, requireAdmin, deleteUser);
+router.delete("/deleteuser/:id", authenticate, requireAdmin, deleteUser);
 
 router.put("/toggleadmin/:id", authenticate, requireAdmin, toggle)
 

@@ -9,12 +9,17 @@ import statsRoutes from "./routes/statsRoutes.js";
 const app = express();
 
 // Global middleware
-// app.use(cors{
- //  origin: ["https://localhost:5173", "*"], // frontend domain
- //  methods: ["GET", "POST", "PUT", "DELETE"],
- //  credentials: true,}
-// );
+
 app.use(express.json());
+
+if (process.env.NODE_ENV !== "production") {
+  app.use(cors({
+    origin: "https://localhost:5173", // must match frontend exactly
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  }));
+}
 
 // Route mounting
 app.use("/api/auth", authRoutes);
