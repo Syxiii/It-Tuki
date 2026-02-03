@@ -61,6 +61,7 @@ jobs:
 
       - name: Build and push backend Docker image
         run: |
+          echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u syxiii --password-stdin
           cd Backend
           docker build -t ghcr.io/syxiii/backend:latest .
           docker push ghcr.io/syxiii/backend:latest
@@ -74,6 +75,7 @@ jobs:
 
       - name: Build and push frontend Docker image
         run: |
+          echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u syxiii --password-stdin
           cd Frontend/vite-project
           docker build -t ghcr.io/syxiii/frontend:latest .
           docker push ghcr.io/syxiii/frontend:latest
