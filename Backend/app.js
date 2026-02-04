@@ -14,7 +14,7 @@ app.use(express.json());
 
 if (process.env.NODE_ENV !== "production") {
   app.use(cors({
-    origin: "https://localhost:5173", // must match frontend exactly
+    origin: "http://localhost:5173", // must match frontend exactly
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
