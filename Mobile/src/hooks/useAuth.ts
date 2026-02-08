@@ -1,27 +1,24 @@
 import { useEffect, useState } from "react";
-import * as Storage from "../utils/storage";
+import * as SecureStore from "expo-secure-store";
 
 export function useAuth() {
   const [loading, setLoading] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    const checkToken = async () => {
-      const token = await Storage.getItem("token");
+    SecureStore.getItemAsync("token").then((token) => {
       setIsLoggedIn(!!token);
       setLoading(false);
-    };
-
-    checkToken();
+    });
   }, []);
 
   const saveToken = async (token: string) => {
-    await Storage.setItem("token", token);
+    await SecureStore.setItemAsync("token", token);
     setIsLoggedIn(true);
   };
 
   const logout = async () => {
-    await Storage.deleteItem("token");
+    await SecureStore.deleteItemAsync("token");
     setIsLoggedIn(false);
   };
 

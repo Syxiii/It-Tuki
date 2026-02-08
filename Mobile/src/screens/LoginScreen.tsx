@@ -1,39 +1,48 @@
 import { View, Text, TextInput, Button, StyleSheet } from "react-native";
 import { useState } from "react";
+import { login } from "../api/auth";
 import { useAuth } from "../hooks/useAuth";
 
-export default function LoginScreen({ navigation }: any) {
-  const { saveToken } = useAuth();
+export default function LoginScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+
+  const { saveToken } = useAuth();
 
   const handleLogin = async () => {
-    await saveToken("FAKE_TOKEN");
-    navigation.replace("Tickets");
+    setError("");
+    try {
+      const data = await login(email, password);
+      await saveToken(data.token);
+    } catch (err) {
+      setError("Virhe kirjautumisessa. Tarkista tunnukset.");
+    }
   };
-
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>IT-tukiportaali</Text>
 
-      <Text>Email</Text>
       <TextInput
+        style={styles.input}
+        placeholder="Sähköposti"
         value={email}
         onChangeText={setEmail}
-        style={styles.input}
         autoCapitalize="none"
       />
 
-      <Text>Password</Text>
       <TextInput
+        style={styles.input}
+        placeholder="Salasana"
         value={password}
         onChangeText={setPassword}
         secureTextEntry
-        style={styles.input}
       />
 
-      <Button title="Kirjaudu" onPress={handleLogin} />
+      {error ? <Text style={styles.error}>{error}</Text> : null}
+
+      <Button title="Kirjaudu sisään" onPress={handleLogin} />
     </View>
   );
 }
@@ -46,14 +55,19 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    marginBottom: 30,
     textAlign: "center",
+    marginBottom: 20,
   },
   input: {
     borderWidth: 1,
     borderColor: "#ccc",
     padding: 10,
-    marginBottom: 15,
-    borderRadius: 4,
+    marginBottom: 10,
+    borderRadius: 5,
+  },
+  error: {
+    color: "red",
+    marginBottom: 10,
+    textAlign: "center",
   },
 });
