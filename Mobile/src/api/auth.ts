@@ -1,7 +1,7 @@
 import { api } from "./client";
 
 export const login = async (email: string, password: string) => {
-  const response = await api.post("/api/auth/login", {
+  const response = await api.post("/auth/login", {
     email,
     password,
   });
@@ -9,5 +9,5 @@ export const login = async (email: string, password: string) => {
 };
 
 export const logoutRequest = async () => {
-  await api.post("/api/auth/logout");
+  await api.post("/auth/logout");
 };
