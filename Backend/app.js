@@ -42,15 +42,13 @@ app.use((err, req, res, next) => {
   res.status(500).json({ message: "Palvelinvirhe" });
 });
 
-if (process.env.NODE_ENV !== "production") {
-const PORT = process.env.PORT || 8080;
-app.listen(8080, "0.0.0.0" ,() => {
-  console.log(`Server running on http://localhost:8080`);
-})}else{
-  const PORT = process.env.PORT || 3000;
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-  });
-}
+const isProd = process.env.NODE_ENV === "production";
+const PORT = isProd ? 3000 : 8080;
+
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(
+    `Server running in ${isProd ? "production" : "development"} on port ${PORT}`
+  );
+});
 
 export default app;
