@@ -1,0 +1,111 @@
+name: CI/CD Backend + Frontend
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: test_db
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U test -d test_db"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=5
+    steps:
+      - name: Checkout backend
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install backend dependencies
+        run: cd Backend && npm ci
+
+      - name: Install Postgres client
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client
+
+      - name: Deploy database migrations
+        run: cd Backend && npx prisma migrate deploy --schema=prisma/schema.prisma
+        env:
+          DATABASE_URL: postgresql://test:test@127.0.0.1:5432/test_db
+
+      - name: Run backend tests
+        run: cd Backend && npm test
+        env:
+          DATABASE_URL: postgresql://test:test@127.0.0.1:5432/test_db
+
+  docker-login:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Login to GitHub Container Registry
+        run: echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u syxiii --password-stdin
+
+  build-and-push-backend:
+    needs: [test, docker-login]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout backend
+        uses: actions/checkout@v4
+
+      - name: Build and push backend Docker image
+        run: |
+          echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u syxiii --password-stdin
+          cd Backend
+          docker build -t ghcr.io/syxiii/backend:latest .
+          docker push ghcr.io/syxiii/backend:latest
+
+  build-and-push-frontend:
+    needs: [test, docker-login]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout frontend
+        uses: actions/checkout@v4
+
+      - name: Build and push frontend Docker image
+        run: |
+          echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u syxiii --password-stdin
+          cd Frontend/vite-project
+          docker build -t ghcr.io/syxiii/frontend:latest .
+          docker push ghcr.io/syxiii/frontend:latest
+
+  deploy:
+    needs: [build-and-push-backend, build-and-push-frontend]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy backend via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u syxiii --password-stdin
+            cd /var/www/backend
+            docker-compose down -v
+            docker-compose pull
+            docker-compose up -d
+
+      - name: Deploy frontend via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u syxiii --password-stdin
+            cd /var/www/frontend
+            docker-compose down -v
+            docker-compose pull
+            docker-compose up -d
