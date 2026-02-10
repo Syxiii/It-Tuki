@@ -123,3 +123,5 @@ export async function deleteTicket(req, res) {
     res.status(500).json({ message: "Palvelinvirhe" });
   }
 }
+
+//Ddd
