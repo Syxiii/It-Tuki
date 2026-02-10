@@ -73,6 +73,24 @@ export default function MyTickets() {
     return <div className="container">Ladataan tikettejä...</div>;
   }
 
+  const getStatusBadge = (status) => {
+    const statusValue = String(status || "").trim();
+    const statusKey = statusValue.toUpperCase();
+
+    const statusMap = {
+      AVOIN: { label: "Avoin", className: "badge-avoin" },
+      KASITTELYSSA: { label: "Käsittelyssä", className: "badge-kasittelyssa" },
+      "KÄSITTELYSSÄ": { label: "Käsittelyssä", className: "badge-kasittelyssa" },
+      RATKAISTU: { label: "Ratkaistu", className: "badge-ratkaistu" },
+    };
+
+    const statusConfig = statusMap[statusKey];
+    return {
+      label: statusConfig?.label || statusValue || "-",
+      className: statusConfig?.className || "",
+    };
+  };
+
   return (
     <div className="container">
       <h2>Omat tiketit</h2>
@@ -108,7 +126,11 @@ export default function MyTickets() {
             </div>
 
             <p className="ticket-detail-meta">
-              Tila: {selectedTicket.status} • Prioriteetti: {selectedTicket.priority || "-"}
+              Tila:{" "}
+              <span className={`badge ${getStatusBadge(selectedTicket.status).className}`.trim()}>
+                {getStatusBadge(selectedTicket.status).label}
+              </span>
+              {" "}• Prioriteetti: {selectedTicket.priority || "-"}
             </p>
             <p className="ticket-detail-description">{selectedTicket.description}</p>
 

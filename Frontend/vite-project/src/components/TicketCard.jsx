@@ -1,11 +1,18 @@
 function TicketCard({ ticket, isAdmin = false, onStatusChange, onClick }) {
-  const statusClass = ticket.status === "Avoin" ? "badge-avoin"
-                    : ticket.status === "Käsittelyssä" ? "badge-kasittelyssa"
-                    : "badge-ratkaistu";
+  const statusValue = String(ticket.status || "").trim();
+  const statusKey = statusValue.toUpperCase();
 
-  const statusIcon = ticket.status === "Avoin" ? "🔴"
-                   : ticket.status === "Käsittelyssä" ? "🟡"
-                   : "🟢";
+  const statusMap = {
+    AVOIN: { label: "Avoin", className: "badge-avoin", icon: "🔴" },
+    KASITTELYSSA: { label: "Käsittelyssä", className: "badge-kasittelyssa", icon: "🟡" },
+    "KÄSITTELYSSÄ": { label: "Käsittelyssä", className: "badge-kasittelyssa", icon: "🟡" },
+    RATKAISTU: { label: "Ratkaistu", className: "badge-ratkaistu", icon: "🟢" },
+  };
+
+  const statusConfig = statusMap[statusKey];
+  const statusLabel = statusConfig?.label || statusValue || "-";
+  const statusClass = statusConfig?.className || "";
+  const statusIcon = statusConfig?.icon || "";
 
   return (
     <div
@@ -25,9 +32,9 @@ function TicketCard({ ticket, isAdmin = false, onStatusChange, onClick }) {
           <h3>{ticket.title}</h3>
           <p className="ticket-user">Lähettäjä: {ticket.user}</p>
         </div>
-        <span className={`badge ${statusClass}`}>
-          <span className="status-icon">{statusIcon}</span>
-          {ticket.status}
+        <span className={`badge ${statusClass}`.trim()}>
+          {statusIcon && <span className="status-icon">{statusIcon}</span>}
+          {statusLabel}
         </span>
       </div>
       
