@@ -10,6 +10,9 @@
     "postinstall": "prisma generate",
     "test": "node --test"
   },
+    "prisma": {
+    "seed": "node prisma/seed.js"
+  },
   "dependencies": {
     "@prisma/client": "6.19.2",
     "argon2": "0.44.0",
