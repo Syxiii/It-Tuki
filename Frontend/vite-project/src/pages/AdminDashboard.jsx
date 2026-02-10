@@ -110,6 +110,12 @@ export default function AdminDashboard({ token }) {
     Ratkaistu: tickets.filter((t) => t.status === STATUS.RATKAISTU).length
   };
 
+  const statusActions = [
+    { label: "Avoin", classKey: "avoin" },
+    { label: "Käsittelyssä", classKey: "kasittelyssa" },
+    { label: "Ratkaistu", classKey: "ratkaistu" }
+  ];
+
 
   return (
     <div className="container">
@@ -147,16 +153,17 @@ export default function AdminDashboard({ token }) {
             </p>
 
             <div className="status-buttons">
-              {["Avoin", "Käsittelyssä", "Ratkaistu"].map((status) => (
+              {statusActions.map((status) => (
                 <button
-                  key={status}
+                  key={status.label}
+                  className={`status-button status-button-${status.classKey}`}
                   onClick={(e) => {
                     e.stopPropagation();
-                    changeStatus(ticket.id, status);
+                    changeStatus(ticket.id, status.label);
                   }}
-                  disabled={ticket.status === status}
+                  disabled={ticket.status === status.label}
                 >
-                  {status}
+                  {status.label}
                 </button>
               ))}
               <button
