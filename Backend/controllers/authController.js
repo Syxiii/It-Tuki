@@ -169,4 +169,51 @@ export async function logout(req, res) {
   return res.status(200).json({ message: "Kirjauduttu ulos onnistuneesti" });
 }
 
+export async function updateUser(req, res) {
+  try {
+    const userId = Number(req.body.userId)
+    const { name, email, password } = req.body
+
+    if (!userId) {
+      return res.status(400).json({ message: "Virheellinen käyttäjä-ID" })
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    })
+
+    if (!user) {
+      return res.status(404).json({ message: "Käyttäjää ei löydy" })
+    }
+
+    const data = {}
+
+    if (name) data.name = name
+    if (email) data.email = email
+    if (password) {
+      data.passwordHash = await hashPassword(password)
+    }
+
+    if (Object.keys(data).length === 0) {
+      return res.status(400).json({ message: "Ei päivitettäviä tietoja" })
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data,
+    })
+
+    return res.status(200).json({
+      id: updatedUser.id,
+      name: updatedUser.name,
+      email: updatedUser.email,
+    })
+  } catch (err) {
+    console.error("Update user error:", err)
+    return res
+      .status(500)
+      .json({ message: "Käyttäjätietojen muuttaminen epäonnistui" })
+  }
+}
+
 //Dd
