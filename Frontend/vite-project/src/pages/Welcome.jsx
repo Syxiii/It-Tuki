@@ -3,7 +3,7 @@ export default function Welcome({ currentUser }) {
     <div className="welcome-page">
       <div className="welcome-hero">
         <h1>Tervetuloa IT-tuen sivulle!</h1>
-        <p className="welcome-subtitle">Hei {currentUser}, olemme täällä valmiina auttamaan sinua</p>
+        <p className="welcome-subtitle">Hei {currentUser}, olemme täällä valmiina auttamaan sinua!</p>
       </div>
 
       <div className="welcome-content">
@@ -21,7 +21,7 @@ export default function Welcome({ currentUser }) {
           <p>
             Voit seurata kaikkia lähettämiäsi tukipyyntöjä "Omat tiketit"
             -sivulta. Näet kunkin tiketin tilan ja voit seurata sen etenemistä
-            reaaliajassa.
+            reaaliajassa. Ja halutessasi voit lisätä myös kommentteja tiketteihisi!
           </p>
         </div>
 
@@ -38,7 +38,7 @@ export default function Welcome({ currentUser }) {
           <ul>
             <li>Maanantai - Perjantai: 08:00 - 17:00</li>
             <li>Lauantai ja sunnuntai: Suljettu</li>
-            <li>Kiireelliset ongelmat: ota yhteyttä puhelimitse</li>
+            <li>Kiireelliset ongelmat: Ota yhteyttä puhelimitse!</li>
           </ul>
         </div>
 
@@ -47,7 +47,7 @@ export default function Welcome({ currentUser }) {
           <p>
             <strong>Puhelinnumero:</strong> +358 (0)1 234 5678<br />
             <strong>Sähköposti:</strong> support@company.fi<br />
-            <strong>Chat:</strong> Saatavilla toimistoajat
+            <strong>Chat:</strong> Saatavilla toimiston aukioloaikoina verkkosivullamme!
           </p>
         </div>
       </div>
