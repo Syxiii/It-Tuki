@@ -28,7 +28,6 @@ const Login = ({ navigation, onLogin }) => {
         password,
       });
       onLogin(response.data.token, response.data.user);
-      navigation.navigate("Welcome");
     } catch (error) {
       const message =
         error?.response?.data?.message || "Kirjautuminen epäonnistui";

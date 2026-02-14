@@ -162,7 +162,7 @@ export default function MyTickets() {
       )}
 
       <Modal visible={Boolean(selectedTicket)} animationType="slide">
-        <ScrollView contentContainerStyle={styles.modalContainer}>
+        <ScrollView style={styles.modalScroll} contentContainerStyle={styles.modalContainer}>
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>{selectedTicket?.title}</Text>
             <TouchableOpacity onPress={handleCloseDetails}>
@@ -316,6 +316,10 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     padding: 16,
+    backgroundColor: "#0f172a",
+  },
+  modalScroll: {
+    flex: 1,
     backgroundColor: "#0f172a",
   },
   modalHeader: {

@@ -6,7 +6,7 @@ export default function Welcome({ navigation, currentUser, onLogout }) {
   const isAdmin = currentUser?.role === "ADMIN";
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView style={styles.scroll} contentContainerStyle={styles.container}>
       <Text style={styles.title}>IT-tukipalvelu</Text>
       <Text style={styles.subtitle}>Tervetuloa {displayName}</Text>
 
@@ -80,6 +80,10 @@ export default function Welcome({ navigation, currentUser, onLogout }) {
 }
 
 const styles = StyleSheet.create({
+  scroll: {
+    flex: 1,
+    backgroundColor: "#0f172a",
+  },
   container: {
     padding: 20,
     backgroundColor: "#0f172a",

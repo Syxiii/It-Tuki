@@ -97,12 +97,14 @@ export default function UserManagement() {
           <TextInput
             style={styles.input}
             placeholder="Nimi"
+            placeholderTextColor="#94a3b8"
             value={name}
             onChangeText={setName}
           />
           <TextInput
             style={styles.input}
             placeholder="Sähköposti"
+            placeholderTextColor="#94a3b8"
             value={email}
             onChangeText={setEmail}
             autoCapitalize="none"
@@ -110,6 +112,7 @@ export default function UserManagement() {
           <TextInput
             style={styles.input}
             placeholder="Salasana"
+            placeholderTextColor="#94a3b8"
             value={password}
             onChangeText={setPassword}
             secureTextEntry

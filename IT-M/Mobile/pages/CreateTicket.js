@@ -55,7 +55,7 @@ export default function CreateTicket() {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView style={styles.scroll} contentContainerStyle={styles.container}>
       <Text style={styles.title}>Luo tiketti</Text>
 
       <Text style={styles.label}>Otsikko</Text>
@@ -124,6 +124,10 @@ export default function CreateTicket() {
 }
 
 const styles = StyleSheet.create({
+  scroll: {
+    flex: 1,
+    backgroundColor: "#0f172a",
+  },
   container: {
     padding: 20,
     backgroundColor: "#0f172a",
