@@ -2,13 +2,22 @@ import prisma from "../prisma/client.js";
 import admin from "firebase-admin";
 import fs from "fs";
 
-const serviceAccount = JSON.parse(fs.readFileSync("/app/firebase-key.json", "utf-8"));
+const isProduction = process.env.NODE_ENV === "production"; // or process.env.PRODUCTION === "true"
 
-if (!admin.apps.length) {
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-  });
+let serviceAccount;
+if (isProduction) {
+  serviceAccount = JSON.parse(fs.readFileSync("/app/firebase.key.json", "utf-8"));
+
+  if (!admin.apps.length) {
+    admin.initializeApp({
+      credential: admin.credential.cert(serviceAccount),
+    });
+    console.log("Firebase initialized (production)");
+  }
+} else {
+  console.log("Firebase not initialized (not production)");
 }
+
 
 /**
  * GET /api/tickets
