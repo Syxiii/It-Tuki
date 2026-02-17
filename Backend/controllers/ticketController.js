@@ -1,12 +1,25 @@
 import prisma from "../prisma/client.js";
 import admin from "firebase-admin";
 import path from "path";
+import { fileURLToPath } from "url";
+import { readFileSync } from "fs";
 
-const serviceAccount = require(path.resolve(__dirname, "../firebase-key.json"));
+// For __dirname in ESM
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-});
+// Absolute path inside Docker container
+const serviceAccountPath = path.join("/app", "firebase-key.json");
+
+// Read and parse the JSON file
+const serviceAccount = JSON.parse(readFileSync(serviceAccountPath, "utf-8"));
+
+// Initialize Firebase Admin
+if (!admin.apps.length) {
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+  });
+}
 
 /**
  * GET /api/tickets
