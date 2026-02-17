@@ -1,14 +1,29 @@
-import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useRef, useState, createContext } from 'react';
+import { ActivityIndicator, AppState, Platform, StyleSheet, Text, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import notifee, { AndroidImportance, TriggerType } from '@notifee/react-native';
 import AppNavigator from './navigation/AppNavigator';
 import { setAuthToken } from './pages/api';
+
+export const LanguageContext = createContext();
+
+const LOGOUT_DELAY_MS = 5 * 60 * 1000;
+const LOGOUT_AT_KEY = 'logoutAt';
+const LOGOUT_TRIGGER_ID_KEY = 'logoutTriggerId';
+const LOGOUT_WARNING_ID = 'logout-warning';
+const LOGOUT_COMPLETE_ID = 'logout-complete';
 
 export default function App() {
   const [currentUser, setCurrentUser] = useState(null);
   const [token, setToken] = useState("");
   const [restoring, setRestoring] = useState(true);
   const [language, setLanguage] = useState("fi");
+  const tokenRef = useRef(token);
+  const channelIdRef = useRef(null);
+
+  useEffect(() => {
+    tokenRef.current = token;
+  }, [token]);
 
   useEffect(() => {
     const loadUserData = async () => {
@@ -37,10 +52,160 @@ export default function App() {
     loadUserData();
   }, []);
 
+  useEffect(() => {
+    const initializeNotifications = async () => {
+      if (Platform.OS !== 'android') {
+        return;
+      }
+
+      await notifee.requestPermission();
+
+      if (!channelIdRef.current) {
+        channelIdRef.current = await notifee.createChannel({
+          id: 'security',
+          name: 'Security',
+          importance: AndroidImportance.HIGH,
+        });
+      }
+
+      await reconcileLogoutOnLaunch();
+    };
+
+    initializeNotifications();
+
+    const subscription = AppState.addEventListener('change', handleAppStateChange);
+    return () => subscription.remove();
+  }, []);
+
+  const ensureNotificationChannel = async () => {
+    if (channelIdRef.current) {
+      return channelIdRef.current;
+    }
+
+    const channelId = await notifee.createChannel({
+      id: 'security',
+      name: 'Security',
+      importance: AndroidImportance.HIGH,
+    });
+    channelIdRef.current = channelId;
+    return channelId;
+  };
+
+  const clearPendingLogout = async ({ keepCompleteNotification = false } = {}) => {
+    if (Platform.OS !== 'android') {
+      await AsyncStorage.multiRemove([LOGOUT_AT_KEY, LOGOUT_TRIGGER_ID_KEY]);
+      return;
+    }
+
+    const triggerId = await AsyncStorage.getItem(LOGOUT_TRIGGER_ID_KEY);
+    if (triggerId) {
+      await notifee.cancelTriggerNotification(triggerId);
+    }
+
+    await notifee.cancelNotification(LOGOUT_WARNING_ID);
+    if (!keepCompleteNotification) {
+      await notifee.cancelNotification(LOGOUT_COMPLETE_ID);
+    }
+
+    await AsyncStorage.multiRemove([LOGOUT_AT_KEY, LOGOUT_TRIGGER_ID_KEY]);
+  };
+
+  const displayLogoutCompleteNotification = async () => {
+    if (Platform.OS !== 'android') {
+      return;
+    }
+
+    const channelId = await ensureNotificationChannel();
+    await notifee.displayNotification({
+      id: LOGOUT_COMPLETE_ID,
+      title: 'Kirjauduttu ulos',
+      body: 'Olet kirjattu ulos turvallisuussyista.',
+      android: {
+        channelId,
+        smallIcon: 'ic_launcher',
+      },
+    });
+  };
+
+  const scheduleLogoutNotifications = async () => {
+    if (!tokenRef.current || Platform.OS !== 'android') {
+      return;
+    }
+
+    await clearPendingLogout();
+    const channelId = await ensureNotificationChannel();
+    const logoutAt = Date.now() + LOGOUT_DELAY_MS;
+
+    await notifee.displayNotification({
+      id: LOGOUT_WARNING_ID,
+      title: 'Istunto päättyy pian',
+      body: 'Sinut kirjataan ulos 5 minuutin kuluttua.',
+      android: {
+        channelId,
+        smallIcon: 'ic_launcher',
+      },
+    });
+
+    const triggerId = await notifee.createTriggerNotification(
+      {
+        id: LOGOUT_COMPLETE_ID,
+        title: 'Kirjauduttu ulos',
+        body: 'Olet kirjattu ulos turvallisuussyista.',
+        android: {
+          channelId,
+          smallIcon: 'ic_launcher',
+        },
+      },
+      {
+        type: TriggerType.TIMESTAMP,
+        timestamp: logoutAt,
+        alarmManager: { allowWhileIdle: true },
+      }
+    );
+
+    await AsyncStorage.multiSet([
+      [LOGOUT_AT_KEY, logoutAt.toString()],
+      [LOGOUT_TRIGGER_ID_KEY, triggerId],
+    ]);
+  };
+
+  const reconcileLogoutOnLaunch = async () => {
+    const logoutAtRaw = await AsyncStorage.getItem(LOGOUT_AT_KEY);
+    if (!logoutAtRaw) {
+      return;
+    }
+
+    const logoutAt = Number(logoutAtRaw);
+    if (!Number.isFinite(logoutAt)) {
+      await clearPendingLogout();
+      return;
+    }
+
+    if (Date.now() >= logoutAt) {
+      await displayLogoutCompleteNotification();
+      await handleLogout({ keepCompleteNotification: true });
+      return;
+    }
+
+    await clearPendingLogout();
+  };
+
+  const handleAppStateChange = async (nextState) => {
+    if (nextState === 'active') {
+      await reconcileLogoutOnLaunch();
+      return;
+    }
+
+    if (nextState === 'background' || nextState === 'inactive') {
+      await scheduleLogoutNotifications();
+    }
+  };
+
   const handleLogin = async (newToken, user) => {
     try {
       await AsyncStorage.setItem("token", newToken);
       await AsyncStorage.setItem("user", JSON.stringify(user));
+      await clearPendingLogout();
       setAuthToken(newToken);
       setToken(newToken);
       setCurrentUser(user);
@@ -49,10 +214,11 @@ export default function App() {
     }
   };
 
-  const handleLogout = async () => {
+  const handleLogout = async ({ keepCompleteNotification = false } = {}) => {
     try {
       await AsyncStorage.removeItem("token");
       await AsyncStorage.removeItem("user");
+      await clearPendingLogout({ keepCompleteNotification });
       setAuthToken("");
       setToken("");
       setCurrentUser(null);
@@ -80,14 +246,16 @@ export default function App() {
   }
 
   return (
-    <AppNavigator
-      onLogin={handleLogin}
-      onLogout={handleLogout}
-      onLanguageChange={handleLanguageChange}
-      currentUser={currentUser}
-      token={token}
-      language={language}
-    />
+    <LanguageContext.Provider value={{ language, setLanguage: handleLanguageChange }}>
+      <AppNavigator
+        onLogin={handleLogin}
+        onLogout={handleLogout}
+        onLanguageChange={handleLanguageChange}
+        currentUser={currentUser}
+        token={token}
+        language={language}
+      />
+    </LanguageContext.Provider>
   );
 }
 
