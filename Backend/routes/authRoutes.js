@@ -1,6 +1,6 @@
 //fix
 import express from "express";
-import { login, logout, register, getUsers, deleteUser, toggle} from "../controllers/authController.js";
+import { login, logout, register, getUsers, deleteUser, toggle, updateUser} from "../controllers/authController.js";
 import { authenticate, requireAdmin } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
@@ -18,5 +18,7 @@ router.get("/getusers", authenticate, requireAdmin, getUsers);
 router.delete("/deleteuser/:id", authenticate, requireAdmin, deleteUser);
 
 router.put("/toggleadmin/:id", authenticate, requireAdmin, toggle)
+
+router.put("/updateUser/:id", authenticate, requireAdmin, updateUser)
 
 export default router;
