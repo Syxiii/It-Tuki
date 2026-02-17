@@ -15,7 +15,7 @@ import api from "./api";
 
 const statusActions = [
   { label: "Avoin", value: "Avoin" },
-  { label: "Kasittelyssa", value: "Kasittelyssa" },
+  { label: "Kasittelyssa", value: "Käsittelyssä" },
   { label: "Ratkaistu", value: "Ratkaistu" },
 ];
 
