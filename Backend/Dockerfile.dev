@@ -1,9 +1,15 @@
-##fix
 FROM node:20-alpine
 
 WORKDIR /app
 
-RUN apk add --no-cache bash git openssh python3 make g++
+RUN apk add --no-cache \
+  bash \
+  git \
+  openssh \
+  python3 \
+  make \
+  g++ \
+  postgresql-client
 
 COPY package*.json ./
 COPY prisma ./prisma
@@ -14,5 +20,5 @@ COPY . .
 
 EXPOSE 8080
 
-CMD ["sh", "-c", "npx prisma migrate dev && npx prisma db seed && npm run dev"]
+CMD ["sh", "-c", "until pg_isready -h postgres -p 5432 -U postgres; do echo 'Waiting for postgres...'; sleep 5; done && npx prisma migrate dev && npx prisma db seed && npm run dev"]
 
