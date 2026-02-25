@@ -40,12 +40,14 @@ IT-Tuki on tuki- ja lipunhallintajärjestelmä, joka mahdollistaa:
 - **Firebase Admin** - Push-ilmoitukset
 - **Argon2** - Salasanojen hash-funktio
 - **JWT** - Autentikaatio
+- **NGINX** - CORS Autentikaatio ja routing docker kontteihin.
 
 ### Frontend
 - **React 19** - UI-kirjasto
 - **Vite** - Rakennustyökalu ja kehityspalvelin
 - **React Router** - Reitittäminen
 - **Axios** - HTTP-asiakas
+- **NGINX** - Routing docker kontteihin.
 
 ### Mobile
 - **React Native** - Cross-platform mobiilikehitys
