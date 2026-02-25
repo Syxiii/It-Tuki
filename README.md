@@ -1,6 +1,6 @@
 ﻿# IT-Tuki - IT Support Portal
 
-IT-Tuki on täysin modulaarinen tuki- ja lipunhallintajärjestelmä. Sovellus koostuu kolmesta pääosasta: backend API, web-pääkäyttäjän hallintapaneeli sekä React Native mobiilisovellus käyttäjille.
+IT-Tuki on täysin modulaarinen tuki- ja lipunhallintajärjestelmä. Sovellus koostuu kolmesta pääosasta: backend API, web-pääkäyttäjän hallintapaneeli tai käyttäjän paneeli sekä React Native mobiilisovellus käyttäjille ja pääkäyttäjille.
 
 ## Sisällysluettelo
 
